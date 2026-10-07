@@ -8,13 +8,11 @@ router = APIRouter(
     prefix="/clients",
 )
 
-CLIENT_LIST = [Client(id_=1,nome="João", email="joao@example.com", telefone="(11) 1111-1111")]
-
 @router.get("/", response_model=list[Client])
 async def list_clients(cliente_repositorio:Annotated[ClienteRepositorio, Depends(get_cliente_repositorio)]):
     return await cliente_repositorio.listar_clientes()
 
-@router.get("/{client_id}", response_model=Client | None)
+@router.get("/{client_id}", response_model=Client)
 async def obter_client(cliente_repositorio:Annotated[ClienteRepositorio, Depends(get_cliente_repositorio)], client_id: int):
     client = await cliente_repositorio.obter_cliente(client_id)
 
@@ -27,7 +25,7 @@ async def obter_client(cliente_repositorio:Annotated[ClienteRepositorio, Depends
 async def create_client(cliente_repositorio:Annotated[ClienteRepositorio, Depends(get_cliente_repositorio)], client: ClientCreate):
     return await cliente_repositorio.create_client(client)
 
-@router.put("/{client_id}", response_model=Client | None)
+@router.put("/{client_id}", response_model=Client)
 async def update_client(cliente_repositorio:Annotated[ClienteRepositorio, Depends(get_cliente_repositorio)], client_id: int, client: ClientCreate):
     updated_client = await cliente_repositorio.update_client(client_id, client)
 
