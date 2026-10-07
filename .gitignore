@@ -1,6 +1,6 @@
-   .env
-   venv/
-   .venv/
-   __pycache__/
-   *.pyc
-   techlog.db
+.venv/
+__pycache__/
+*.pyc
+.env
+*.db
+linha-que-faltou
