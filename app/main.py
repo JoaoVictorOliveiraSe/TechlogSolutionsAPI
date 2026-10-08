@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-from app.routes import client
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from app.routes import client, login, registro
 from app.depends import banco_de_dados
 
+templates = Jinja2Templates(directory="templates")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,27 +20,19 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(client.router)
+app.include_router(client.frontend_router)
+app.include_router(login.router)
+app.include_router(registro.router)
 
-@app.get("/")
+@app.get("/health")
 async def health_check():
     return {"status": "OK"}
 
-@app.get("/front", response_class=HTMLResponse)
-async def front_page():
-    html_content = """
-    <html>
-        <head>
-            <title>Techlog Solutions API</title>
-        </head>
-        <body>
-            <h1>Welcome to Techlog Solutions API</h1>
-            <p>This is the front page of the Techlog Solutions API.</p>
-            <p>Status: <strong> Operacional </strong></p>
-        </body>
-    </html>
-"""
-    return html_content
+@app.get("/", response_class=HTMLResponse)
+async def front_page(request: Request):
+    return templates.TemplateResponse(request, "index.html", {"request": request, "title": "Techlog Solutions CRM", "version": "1.0.0"})
 
 if __name__ == "__main__":
     import uvicorn
